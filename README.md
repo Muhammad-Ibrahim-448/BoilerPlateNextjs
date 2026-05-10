@@ -1,36 +1,110 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 🚀 Enterprise SaaS Foundation | Next.js 15
 
-## Getting Started
+A production-ready, highly modular boilerplate designed for scalable SaaS applications. This repository implements a **Domain-Driven Layout** strategy, separating public marketing concerns from authenticated application logic.
 
-First, run the development server:
+## 🏗 Architectural Overview
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+This boilerplate follows a strict separation of concerns to ensure that as the application grows, the codebase remains maintainable.
+
+### 1. Unified Route Groups
+
+We utilize Next.js Route Groups to manage distinct application contexts without affecting the URL structure:
+
+* **`(website)`**: Handles the SEO-optimized marketing site, landing pages, and legal docs.
+* **`(dashboard)`**: A secure, stateful environment for user-authenticated workflows.
+
+### 2. Component Design System
+
+Our `src/components` directory is organized by **Atomic Responsibility**:
+
+* **`common/`**: The "Atoms" (Buttons, Inputs) – stateless and highly reusable.
+* **`sections/`**: The "Organisms" (Hero, Pricing) – layout blocks for the marketing site.
+* **`dashboard/`**: Specialized components for the internal app (Analytics, User Lists).
+* **`charts/ & tables/`**: Data-heavy presentation layers optimized for performance.
+
+---
+
+## 📂 System Hierarchy
+
+```text
+src/
+├── app/
+│   ├── (dashboard)/     # Authenticated App Shell & Routes
+│   └── (website)/       # Public Marketing Shell & Routes
+├── components/
+│   ├── animations/      # Framer Motion orchestration
+│   ├── layout/          # Cross-cutting UI (Sidebar, Navbar, Footer)
+│   └── ...              # Atomic UI categories
+├── context/             # Global State (Auth, Theme, Dashboard State)
+├── hooks/               # Logic encapsulation (useAuth, useFetch)
+├── lib/                 # Core utilities (Axios interceptors, Helper functions)
+└── public/              # Static assets and branding
+
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## 🛠 Tech Stack & Core Features
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Feature | Implementation |
+| --- | --- |
+| **Framework** | Next.js 15 (App Router) |
+| **Styling** | Tailwind CSS (Utility-first) |
+| **State Management** | React Context API (Modularized) |
+| **Data Fetching** | Axios + Custom `useFetch` hook |
+| **Animations** | Framer Motion (Scroll reveal & micro-interactions) |
+| **Icons & Media** | Lucide React (standard) |
+| **Theming** | CSS Variables + `ThemeContext` (Dark/Light support) |
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 🚀 Development Workflow
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Prerequisites
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+* Node.js 18.x or higher
+* NPM / PNPM / Bun
 
-## Deploy on Vercel
+### Setup
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+# Clone the repository
+git clone <your-repo-url>
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Install dependencies
+npm install
+
+# Start the development server
+npm run dev
+
+```
+
+### Deployment
+
+This project is optimized for **Vercel** but can be containerized using the standard Next.js Dockerfile.
+
+```bash
+npm run build
+
+```
+
+---
+
+## 🛡 Performance & Best Practices
+
+* **Optimized Fonts**: Uses `next/font` for zero CLS (Cumulative Layout Shift).
+* **Code Splitting**: Dynamic imports used for heavy components (Charts/Modals) to keep the initial bundle small.
+* **Motion Wrapper**: A centralized `MotionWrapper` handles GPU-accelerated animations efficiently.
+* **Layout Nesting**: Leverages Next.js nested layouts to prevent unnecessary re-renders of Sidebars and Navbars during navigation.
+
+## 🤝 Contribution Guidelines
+
+When adding new features:
+
+1. **UI Components**: Place in `components/common` if it’s a primitive, or a specific folder if it’s a complex feature.
+2. **Context**: Keep providers focused. Do not bloat `AuthContext` with dashboard-specific state.
+3. **Hooks**: Always extract data-fetching or complex logic into the `hooks/` directory.
+
+---
+
+Designed with ❤️ for high-performance SaaS products.
