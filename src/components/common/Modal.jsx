@@ -5,8 +5,18 @@ import { useEffect } from 'react'
 import { X } from 'lucide-react'
 import { Button } from './Button'
 import { cn } from '@/lib/helpers'
+import { useTheme } from '@/context/ThemeContext'
 
-export const Modal = ({
+const sizes = {
+  sm: 'max-w-md',
+  md: 'max-w-lg',
+  lg: 'max-w-2xl',
+  xl: 'max-w-4xl',
+  '2xl': 'max-w-6xl',
+  full: 'max-w-full mx-4',
+}
+
+const Modal = ({
   isOpen,
   onClose,
   title,
@@ -14,7 +24,14 @@ export const Modal = ({
   footer,
   size = 'md',
   showCloseButton = true,
+  closeOnOverlayClick = true,
+  className = '',
+  overlayClassName = '',
+  contentClassName = '',
 }) => {
+  const { theme } = useTheme()
+  const isDark = theme === 'dark'
+
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === 'Escape') onClose()
@@ -31,14 +48,6 @@ export const Modal = ({
     }
   }, [isOpen, onClose])
 
-  const sizes = {
-    sm: 'max-w-md',
-    md: 'max-w-lg',
-    lg: 'max-w-2xl',
-    xl: 'max-w-4xl',
-    full: 'max-w-full mx-4',
-  }
-
   return (
     <AnimatePresence>
       {isOpen && (
@@ -48,8 +57,11 @@ export const Modal = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"
-            onClick={onClose}
+            className={cn(
+              'fixed inset-0 bg-slate-900/60 backdrop-blur-sm',
+              overlayClassName
+            )}
+            onClick={closeOnOverlayClick ? onClose : undefined}
           />
           
           <motion.div
@@ -60,16 +72,29 @@ export const Modal = ({
             className={cn(
               'relative w-full',
               sizes[size],
-              'bg-white dark:bg-slate-800 rounded-2xl',
-              'border border-slate-200 dark:border-slate-700',
-              'shadow-2xl shadow-slate-900/20',
-              'overflow-hidden z-10'
+              'rounded-2xl',
+              'border',
+              'shadow-2xl',
+              'overflow-hidden z-10',
+              'theme-transition',
+              isDark 
+                ? 'bg-slate-900 border-slate-800 shadow-slate-950/50' 
+                : 'bg-white border-slate-200 shadow-slate-900/20',
+              className
             )}
           >
             {title && (
-              <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50">
+              <div className={cn(
+                "flex items-center justify-between px-6 py-4 border-b",
+                isDark 
+                  ? "border-slate-800 bg-slate-800/50" 
+                  : "border-slate-200 bg-slate-50/50"
+              )}>
                 <motion.h3 
-                  className="text-lg font-semibold text-slate-900 dark:text-white"
+                  className={cn(
+                    "text-lg font-semibold",
+                    isDark ? "text-white" : "text-slate-900"
+                  )}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.1 }}
@@ -81,7 +106,12 @@ export const Modal = ({
                     whileHover={{ scale: 1.1, rotate: 90 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={onClose}
-                    className="p-2 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                    className={cn(
+                      "p-2 rounded-lg transition-colors",
+                      isDark 
+                        ? "text-slate-400 hover:text-slate-200 hover:bg-slate-700" 
+                        : "text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+                    )}
                   >
                     <X className="h-5 w-5" />
                   </motion.button>
@@ -90,7 +120,7 @@ export const Modal = ({
             )}
             
             <motion.div 
-              className="px-6 py-6"
+              className={cn('px-6 py-6', contentClassName)}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15 }}
@@ -100,7 +130,13 @@ export const Modal = ({
             
             {footer && (
               <motion.div 
-                className="flex justify-end gap-3 px-6 py-4 bg-slate-50/50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-700"
+                className={cn(
+                  'flex justify-end gap-3 px-6 py-4',
+                  'border-t',
+                  isDark 
+                    ? 'bg-slate-800/50 border-slate-800' 
+                    : 'bg-slate-50/50 border-slate-200'
+                )}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
@@ -114,3 +150,13 @@ export const Modal = ({
     </AnimatePresence>
   )
 }
+
+const ModalActions = ({ children, className = '' }) => {
+  return (
+    <div className={cn('flex flex-col sm:flex-row gap-3', className)}>
+      {children}
+    </div>
+  )
+}
+
+export { Modal, ModalActions }

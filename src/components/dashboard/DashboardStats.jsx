@@ -8,6 +8,8 @@ import {
   Activity,
 } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { useTheme } from '@/context/ThemeContext'
+import { cn } from '@/lib/helpers'
 
 const stats = [
   {
@@ -42,11 +44,14 @@ const stats = [
 ]
 
 export const DashboardStats = () => {
+  const { theme } = useTheme()
+  const isDark = theme === 'dark'
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {stats.map((stat, index) => (
         <motion.div
-          key={index}
+          key={stat.title}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.1 }}

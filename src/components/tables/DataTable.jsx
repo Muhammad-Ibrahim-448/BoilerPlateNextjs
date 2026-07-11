@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronUp, ChevronDown, Search, Filter } from 'lucide-react'
 import { Input } from '@/components/common/Input'
 import { Button } from '@/components/common/Button'
+import { useTheme } from '@/context/ThemeContext'
+import { cn } from '@/lib/helpers'
 
 export const DataTable = ({
   columns,
@@ -16,6 +18,8 @@ export const DataTable = ({
   pagination = false,
   itemsPerPage = 10,
 }) => {
+  const { theme } = useTheme()
+  const isDark = theme === 'dark'
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' })
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
@@ -60,12 +64,23 @@ export const DataTable = ({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden"
+      className={cn(
+        "rounded-2xl shadow-sm border overflow-hidden theme-transition",
+        isDark 
+          ? "bg-slate-900/50 border-slate-800/80 shadow-slate-950/50" 
+          : "bg-slate-50/80 border-slate-200/80 shadow-slate-200/50"
+      )}
     >
       {searchable && (
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex gap-4">
+        <div className={cn(
+          "p-4 border-b flex gap-4",
+          isDark ? "border-slate-800" : "border-slate-200"
+        )}>
           <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <Search className={cn(
+              "absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5",
+              isDark ? "text-slate-500" : "text-slate-400"
+            )} />
             <Input
               type="search"
               placeholder="Search..."
@@ -82,17 +97,20 @@ export const DataTable = ({
       )}
 
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-          <thead className="bg-gray-50 dark:bg-gray-700/50">
+        <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
+          <thead className={cn(
+            isDark ? "bg-slate-800/50" : "bg-slate-100/50"
+          )}>
             <tr>
               {columns.map((column) => (
                 <th
                   key={column.key}
                   onClick={() => column.sortable && handleSort(column.key)}
-                  className={`
-                    px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider
-                    ${column.sortable ? 'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors' : ''}
-                  `}
+                  className={cn(
+                    "px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider",
+                    isDark ? "text-slate-400" : "text-slate-500",
+                    column.sortable ? "cursor-pointer hover:bg-slate-200/50 dark:hover:bg-slate-700/50 transition-colors" : ""
+                  )}
                 >
                   <div className="flex items-center gap-1">
                     {column.label}
@@ -110,7 +128,10 @@ export const DataTable = ({
               {(onEdit || onDelete) && <th className="px-6 py-4 text-right">Actions</th>}
             </tr>
           </thead>
-          <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+          <tbody className={cn(
+            "divide-y",
+            isDark ? "divide-slate-800" : "divide-slate-200"
+          )}>
             <AnimatePresence>
               {paginatedData.map((row, index) => (
                 <motion.tr
@@ -122,18 +143,25 @@ export const DataTable = ({
                   onMouseEnter={() => setHoveredRow(index)}
                   onMouseLeave={() => setHoveredRow(null)}
                   onClick={() => onRowClick?.(row)}
-                  className={`
-                    ${onRowClick ? 'cursor-pointer' : ''}
-                    ${hoveredRow === index ? 'bg-blue-50/50 dark:bg-blue-900/20' : ''}
-                    transition-colors duration-200
-                  `}
+                  className={cn(
+                    onRowClick ? 'cursor-pointer' : '',
+                    hoveredRow === index 
+                      ? isDark ? 'bg-blue-900/20' : 'bg-blue-50/50'
+                      : '',
+                    'transition-colors duration-200'
+                  )}
                 >
                   {columns.map((column) => (
                     <td key={column.key} className="px-6 py-4 whitespace-nowrap">
                       {column.render ? (
                         column.render(row[column.key], row)
                       ) : (
-                        <span className="text-sm text-gray-900 dark:text-gray-100">{row[column.key]}</span>
+                        <span className={cn(
+                          "text-sm",
+                          isDark ? "text-slate-100" : "text-slate-900"
+                        )}>
+                          {row[column.key]}
+                        </span>
                       )}
                     </td>
                   ))}
@@ -145,7 +173,10 @@ export const DataTable = ({
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={(e) => { e.stopPropagation(); onEdit(row); }}
-                            className="text-blue-600 hover:text-blue-900 dark:hover:text-blue-400"
+                            className={cn(
+                              "transition-colors",
+                              isDark ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-900"
+                            )}
                           >
                             Edit
                           </motion.button>
@@ -155,7 +186,10 @@ export const DataTable = ({
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
                             onClick={(e) => { e.stopPropagation(); onDelete(row); }}
-                            className="text-red-600 hover:text-red-900 dark:hover:text-red-400"
+                            className={cn(
+                              "transition-colors",
+                              isDark ? "text-red-400 hover:text-red-300" : "text-red-600 hover:text-red-900"
+                            )}
                           >
                             Delete
                           </motion.button>
@@ -174,9 +208,15 @@ export const DataTable = ({
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between"
+          className={cn(
+            "px-6 py-4 border-t flex items-center justify-between",
+            isDark ? "border-slate-800" : "border-slate-200"
+          )}
         >
-          <span className="text-sm text-gray-700 dark:text-gray-300">
+          <span className={cn(
+            "text-sm",
+            isDark ? "text-slate-400" : "text-slate-600"
+          )}>
             Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
             {Math.min(currentPage * itemsPerPage, processedData.length)} of {processedData.length} results
           </span>
@@ -196,13 +236,14 @@ export const DataTable = ({
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={() => setCurrentPage(i + 1)}
-                  className={`
-                    w-8 h-8 rounded-lg text-sm font-medium
-                    ${currentPage === i + 1
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                    }
-                  `}
+                  className={cn(
+                    "w-8 h-8 rounded-lg text-sm font-medium transition-colors",
+                    currentPage === i + 1
+                      ? "bg-blue-600 text-white"
+                      : isDark 
+                        ? "bg-slate-800 text-slate-300 hover:bg-slate-700" 
+                        : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                  )}
                 >
                   {i + 1}
                 </motion.button>

@@ -1,9 +1,12 @@
-"use client"
+// src/app/(website)/services/page.jsx
+'use client'
 
 import { FeatureCard } from '@/components/cards/FeatureCard'
 import { CTASection } from '@/components/sections/CTASection'
-import { WebsiteLayout } from '@/components/layout/WebsiteLayout'
 import { motion } from 'framer-motion'
+import { useTheme } from '@/context/ThemeContext'
+import { useThemeClasses, usePageHeroStyles } from '@/lib/theme-helpers'
+import { cn } from '@/lib/helpers'
 
 const services = [
   {
@@ -29,21 +32,103 @@ const services = [
 ]
 
 export default function ServicesPage() {
+  const { theme } = useTheme()
+  const themeClasses = useThemeClasses()
+  const pageHero = usePageHeroStyles()
+  const isDark = theme === 'dark'
+
   return (
-    <WebsiteLayout>
-      <div className="pt-32 pb-16 bg-slate-50 dark:bg-slate-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white text-center mb-4">
+    <>
+      {/* Hero Section */}
+      <div className={cn(
+        pageHero.container,
+        themeClasses.bg.primary
+      )}>
+        {/* Background decoration */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className={cn(
+            "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-3xl opacity-10",
+            isDark ? "bg-blue-500/10" : "bg-blue-500/5"
+          )} />
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          {/* Badge */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            className="flex justify-center mb-4"
+          >
+            <span className={cn(
+              "inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium",
+              "border transition-colors duration-300",
+              isDark 
+                ? "bg-blue-500/10 text-blue-400 border-blue-500/20" 
+                : "bg-blue-50 text-blue-600 border-blue-200"
+            )}>
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500" />
+              </span>
+              Our Services
+            </span>
+          </motion.div>
+
+          <h1 className={cn(
+            "text-4xl md:text-5xl font-bold text-center mb-4",
+            themeClasses.text.primary
+          )}>
             Our Services
           </h1>
-          <p className="text-xl text-slate-600 dark:text-slate-400 text-center max-w-2xl mx-auto">
+          <p className={cn(
+            "text-xl text-center max-w-2xl mx-auto",
+            themeClasses.text.secondary
+          )}>
             Comprehensive solutions to help your business succeed
           </p>
         </div>
       </div>
       
-      <section className="py-24 bg-white dark:bg-slate-950">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Services Grid */}
+      <section className={cn(
+        "py-24 theme-transition relative overflow-hidden",
+        themeClasses.bg.primary
+      )}>
+        {/* Background decoration */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className={cn(
+            "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full blur-3xl opacity-10",
+            isDark ? "bg-purple-500/10" : "bg-purple-500/5"
+          )} />
+          <div className={cn(
+            "absolute -bottom-40 -right-40 w-96 h-96 rounded-full blur-3xl opacity-10",
+            isDark ? "bg-cyan-500/10" : "bg-cyan-500/5"
+          )} />
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          {/* Section Header */}
+          <motion.div 
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <h2 className={cn(
+              "text-3xl md:text-4xl font-bold mb-4",
+              themeClasses.text.primary
+            )}>
+              What We Offer
+            </h2>
+            <p className={cn(
+              "text-lg max-w-2xl mx-auto",
+              themeClasses.text.secondary
+            )}>
+              Expert services designed to help you get the most out of our platform
+            </p>
+          </motion.div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {services.map((service, index) => (
               <motion.div
@@ -57,10 +142,54 @@ export default function ServicesPage() {
               </motion.div>
             ))}
           </div>
+
+          {/* Trust indicator */}
+          <motion.div 
+            className="mt-16 text-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+          >
+            <div className={cn(
+              "flex flex-wrap justify-center items-center gap-6 md:gap-10",
+              isDark ? "text-slate-300" : "text-slate-400"
+            )}>
+              <span className="flex items-center gap-2">
+                <span className={cn(
+                  "text-sm font-medium",
+                  isDark ? "text-emerald-400" : "text-emerald-600"
+                )}>
+                  ✓
+                </span>
+                <span className="text-sm">10,000+ happy clients</span>
+              </span>
+              <span className="w-px h-6 bg-slate-300 dark:bg-slate-700" />
+              <span className="flex items-center gap-2">
+                <span className={cn(
+                  "text-sm font-medium",
+                  isDark ? "text-emerald-400" : "text-emerald-600"
+                )}>
+                  ✓
+                </span>
+                <span className="text-sm">4.9/5 average rating</span>
+              </span>
+              <span className="w-px h-6 bg-slate-300 dark:bg-slate-700" />
+              <span className="flex items-center gap-2">
+                <span className={cn(
+                  "text-sm font-medium",
+                  isDark ? "text-emerald-400" : "text-emerald-600"
+                )}>
+                  ✓
+                </span>
+                <span className="text-sm">99.9% satisfaction rate</span>
+              </span>
+            </div>
+          </motion.div>
         </div>
       </section>
       
       <CTASection />
-    </WebsiteLayout>
+    </>
   )
 }

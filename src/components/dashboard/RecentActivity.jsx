@@ -2,6 +2,8 @@
 
 import { formatDate } from '@/lib/helpers'
 import { motion } from 'framer-motion'
+import { useTheme } from '@/context/ThemeContext'
+import { cn } from '@/lib/helpers'
 
 const activities = [
   {
@@ -48,21 +50,43 @@ const getActivityIcon = (type) => {
   return icons[type] || icons.create
 }
 
-const getActivityColor = (type) => {
+const getActivityColor = (type, isDark) => {
   const colors = {
-    create: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400',
-    update: 'bg-blue-100 text-blue-600 dark:bg-blue-500/10 dark:text-blue-400',
-    delete: 'bg-rose-100 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400',
-    complete: 'bg-purple-100 text-purple-600 dark:bg-purple-500/10 dark:text-purple-400',
+    create: isDark 
+      ? 'bg-emerald-500/10 text-emerald-400 ring-slate-900' 
+      : 'bg-emerald-100 text-emerald-600 ring-white',
+    update: isDark 
+      ? 'bg-blue-500/10 text-blue-400 ring-slate-900' 
+      : 'bg-blue-100 text-blue-600 ring-white',
+    delete: isDark 
+      ? 'bg-rose-500/10 text-rose-400 ring-slate-900' 
+      : 'bg-rose-100 text-rose-600 ring-white',
+    complete: isDark 
+      ? 'bg-purple-500/10 text-purple-400 ring-slate-900' 
+      : 'bg-purple-100 text-purple-600 ring-white',
   }
   return colors[type] || colors.create
 }
 
 export const RecentActivity = () => {
+  const { theme } = useTheme()
+  const isDark = theme === 'dark'
+
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
-      <div className="p-6 border-b border-slate-200 dark:border-slate-700">
-        <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+    <div className={cn(
+      "rounded-2xl shadow-sm border overflow-hidden theme-transition",
+      isDark 
+        ? "bg-slate-900/50 border-slate-800/80 shadow-slate-950/50" 
+        : "bg-slate-50/80 border-slate-200/80 shadow-slate-200/50"
+    )}>
+      <div className={cn(
+        "p-6 border-b",
+        isDark ? "border-slate-800" : "border-slate-200"
+      )}>
+        <h3 className={cn(
+          "text-lg font-semibold",
+          isDark ? "text-white" : "text-slate-900"
+        )}>
           Recent Activity
         </h3>
       </div>
@@ -78,27 +102,40 @@ export const RecentActivity = () => {
               >
                 <div className="relative pb-8">
                   {index !== activities.length - 1 && (
-                    <span className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-slate-200 dark:bg-slate-700" aria-hidden="true" />
+                    <span className={cn(
+                      "absolute top-4 left-4 -ml-px h-full w-0.5",
+                      isDark ? "bg-slate-700" : "bg-slate-200"
+                    )} aria-hidden="true" />
                   )}
                   <div className="relative flex space-x-3">
-                    <div className={`
-                      h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white dark:ring-slate-800
-                      ${getActivityColor(activity.type)}
-                    `}>
+                    <div className={cn(
+                      "h-8 w-8 rounded-full flex items-center justify-center ring-8",
+                      getActivityColor(activity.type, isDark)
+                    )}>
                       <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={getActivityIcon(activity.type)} />
                       </svg>
                     </div>
                     <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
                       <div>
-                        <p className="text-sm text-slate-900 dark:text-slate-100">
+                        <p className={cn(
+                          "text-sm",
+                          isDark ? "text-slate-100" : "text-slate-900"
+                        )}>
                           <span className="font-medium">{activity.user}</span>{' '}
                           {activity.action}{' '}
-                          <span className="font-medium text-blue-600 dark:text-blue-400">{activity.target}</span>
+                          <span className={cn(
+                            "font-medium",
+                            isDark ? "text-blue-400" : "text-blue-600"
+                          )}>
+                            {activity.target}
+                          </span>
                         </p>
                       </div>
-                      <div className="text-right text-sm whitespace-nowrap text-slate-500 dark:text-slate-400">
-                        {formatDate(activity.time, { hour: '2-digit', minute: '2-digit' })}
+                      <div className="text-right text-sm whitespace-nowrap">
+                        <span className={isDark ? "text-slate-400" : "text-slate-500"}>
+                          {formatDate(activity.time, { hour: '2-digit', minute: '2-digit' })}
+                        </span>
                       </div>
                     </div>
                   </div>

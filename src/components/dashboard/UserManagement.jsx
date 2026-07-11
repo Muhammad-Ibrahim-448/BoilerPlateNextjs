@@ -7,6 +7,8 @@ import { Modal } from '@/components/common/Modal'
 import { Input } from '@/components/common/Input'
 import { Badge } from '@/components/common/Badge'
 import { motion } from 'framer-motion'
+import { useTheme } from '@/context/ThemeContext'
+import { cn } from '@/lib/helpers'
 
 const initialUsers = [
   { id: 1, name: 'John Doe', email: 'john@example.com', role: 'admin', status: 'active', joinDate: '2024-01-15' },
@@ -24,12 +26,14 @@ const columns = [
     key: 'status', 
     label: 'Status', 
     sortable: true,
-    render: (value) => <Badge variant={value === 'active' ? 'success' : 'default'}>{value}</Badge>
+    render: (value) => <Badge variant={value === 'active' ? 'success' : 'warning'}>{value}</Badge>
   },
   { key: 'joinDate', label: 'Join Date', sortable: true },
 ]
 
 export const UserManagement = () => {
+  const { theme } = useTheme()
+  const isDark = theme === 'dark'
   const [users, setUsers] = useState(initialUsers)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingUser, setEditingUser] = useState(null)
@@ -57,7 +61,12 @@ export const UserManagement = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Users</h2>
+        <h2 className={cn(
+          "text-2xl font-bold",
+          isDark ? "text-white" : "text-slate-900"
+        )}>
+          Users
+        </h2>
         <Button onClick={() => setIsModalOpen(true)}>Add User</Button>
       </div>
       
@@ -98,13 +107,21 @@ export const UserManagement = () => {
             onChange={(e) => setEditingUser({...editingUser, email: e.target.value})}
           />
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+            <label className={cn(
+              "block text-sm font-medium mb-1",
+              isDark ? "text-slate-300" : "text-slate-700"
+            )}>
               Role
             </label>
             <select
               value={editingUser?.role || 'user'}
               onChange={(e) => setEditingUser({...editingUser, role: e.target.value})}
-              className="w-full px-4 py-2 border-2 border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:border-blue-500"
+              className={cn(
+                "w-full px-4 py-2 border-2 rounded-xl focus:outline-none focus:border-blue-500 transition-colors",
+                isDark 
+                  ? "bg-slate-900/50 border-slate-700 text-slate-100 focus:ring-4 focus:ring-blue-500/20" 
+                  : "bg-white border-slate-200 text-slate-900 focus:ring-4 focus:ring-blue-500/10"
+              )}
             >
               <option value="user">User</option>
               <option value="manager">Manager</option>

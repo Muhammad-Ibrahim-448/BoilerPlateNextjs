@@ -4,7 +4,7 @@ import { AuthProvider } from '@/context/AuthContext'
 import { DashboardProvider } from '@/context/DashboardContext'
 import { DashboardLayout } from './DashboardLayout'
 
-export const DashboardLayoutWrapper = ({ children }) => {
+const DashboardLayoutWrapper = ({ children }) => {
   return (
     <AuthProvider>
       <DashboardProvider>
@@ -13,3 +13,5 @@ export const DashboardLayoutWrapper = ({ children }) => {
     </AuthProvider>
   )
 }
+
+export { DashboardLayoutWrapper }

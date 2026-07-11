@@ -1,7 +1,10 @@
-"use client"
+'use client'
 
 import Link from 'next/link'
 import { motion } from 'framer-motion'
+import { useTheme } from '@/context/ThemeContext'
+import { useThemeClasses, useGlassEffect, useFooterStyles } from '@/lib/theme-helpers'
+import { cn } from '@/lib/helpers'
 
 const footerLinks = {
   product: [
@@ -29,25 +32,152 @@ const footerLinks = {
   ],
 }
 
-export const Footer = () => {
+export const Footer = ({ variant = 'default' }) => {
+  const { theme, mounted } = useTheme()
+  const themeClasses = useThemeClasses()
+  const glass = useGlassEffect()
+  const footerStyles = useFooterStyles()
+  const isDark = theme === 'dark'
+
+  if (!mounted) {
+    return <FooterSkeleton />
+  }
+
+  // Get footer styles based on variant
+  const getFooterStyles = () => {
+    if (variant === 'light') {
+      return 'bg-white border-t border-slate-200'
+    }
+    
+    if (variant === 'dark') {
+      return 'bg-slate-950 border-t border-slate-800'
+    }
+    
+    if (variant === 'glass') {
+      return cn(
+        glass.default,
+        'border-t border-white/20 dark:border-slate-800/50'
+      )
+    }
+
+    // default - dynamic based on theme
+    return isDark 
+      ? 'bg-slate-900 border-t border-slate-800'
+      : 'bg-white border-t border-slate-200'
+  }
+
+  // Text colors based on variant and theme
+  const getTextColors = () => {
+    if (variant === 'light') {
+      return {
+        heading: 'text-slate-900',
+        body: 'text-slate-600',
+        link: 'text-slate-500 hover:text-blue-600',
+        muted: 'text-slate-500',
+        brand: 'from-blue-600 to-purple-600',
+        social: 'bg-slate-100 text-slate-600 hover:bg-blue-50 hover:text-blue-600',
+      }
+    }
+    
+    if (variant === 'dark') {
+      return {
+        heading: 'text-white',
+        body: 'text-slate-300',
+        link: 'text-slate-300 hover:text-blue-400',
+        muted: 'text-slate-400',
+        brand: 'from-blue-400 to-purple-400',
+        social: 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white',
+      }
+    }
+    
+    if (variant === 'glass') {
+      return isDark 
+        ? {
+            heading: 'text-white',
+            body: 'text-slate-300',
+            link: 'text-slate-400 hover:text-blue-400',
+            muted: 'text-slate-400',
+            brand: 'from-blue-400 to-purple-400',
+            social: 'bg-slate-800/50 text-slate-400 hover:bg-slate-700/50 hover:text-white',
+          }
+        : {
+            heading: 'text-slate-900',
+            body: 'text-slate-600',
+            link: 'text-slate-500 hover:text-blue-600',
+            muted: 'text-slate-500',
+            brand: 'from-blue-600 to-purple-600',
+            social: 'bg-white/50 text-slate-600 hover:bg-white hover:text-blue-600',
+          }
+    }
+
+    // default - dynamic based on theme
+    return isDark 
+      ? {
+          heading: 'text-white',
+          body: 'text-slate-300',
+          link: 'text-slate-300 hover:text-blue-400',
+          muted: 'text-slate-300',
+          brand: 'from-blue-400 to-purple-400',
+          social: 'bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white',
+        }
+      : {
+          heading: 'text-slate-900',
+          body: 'text-slate-600',
+          link: 'text-slate-500 hover:text-blue-600',
+          muted: 'text-slate-500',
+          brand: 'from-blue-600 to-purple-600',
+          social: 'bg-slate-100 text-slate-600 hover:bg-blue-50 hover:text-blue-600',
+        }
+  }
+
+  const colors = getTextColors()
+  const borderColor = isDark ? 'border-slate-500' : 'border-slate-200'
+
   return (
-    <footer className="bg-slate-900 text-slate-300 border-t border-slate-800">
+    <motion.footer
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+      className={cn(
+        'transition-colors duration-500',
+        getFooterStyles()
+      )}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 lg:gap-12">
+          {/* Brand Column */}
           <div className="col-span-2">
-            <span className="text-2xl font-bold text-white mb-4 block">
+            <motion.span
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1 }}
+              className={cn(
+                'text-2xl font-bold block mb-4 bg-gradient-to-r bg-clip-text text-transparent',
+                colors.brand
+              )}
+            >
               SaaS Platform
-            </span>
-            <p className="text-slate-400 mb-6 max-w-xs leading-relaxed">
+            </motion.span>
+            <p className={cn(
+              'mb-6 max-w-xs leading-relaxed transition-colors duration-300',
+              colors.body
+            )}>
               Modern solutions for modern businesses. Scale your operations with our powerful platform.
             </p>
             <div className="flex space-x-4">
-              {['twitter', 'github', 'linkedin'].map((social) => (
+              {['twitter', 'github', 'linkedin'].map((social, index) => (
                 <motion.a
                   key={social}
                   href="#"
                   whileHover={{ scale: 1.1, y: -2 }}
-                  className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
+                  whileTap={{ scale: 0.9 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 + index * 0.05 }}
+                  className={cn(
+                    'w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300',
+                    colors.social
+                  )}
                 >
                   <span className="sr-only">{social}</span>
                   <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -64,37 +194,143 @@ export const Footer = () => {
                 </motion.a>
               ))}
             </div>
+
+            {/* Trust Badge */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 }}
+              className="mt-6"
+            >
+              <div className={cn(
+                "inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium",
+                isDark 
+                  ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                  : "bg-emerald-50 text-emerald-700 border border-emerald-200"
+              )}>
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
+                </span>
+                100% satisfaction guaranteed
+              </div>
+            </motion.div>
           </div>
           
-          {Object.entries(footerLinks).slice(0, 3).map(([category, links]) => (
-            <div key={category}>
-              <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">{category}</h3>
+          {/* Link Columns */}
+          {Object.entries(footerLinks).slice(0, 3).map(([category, links], colIndex) => (
+            <motion.div
+              key={category}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 + colIndex * 0.1 }}
+            >
+              <h3 className={cn(
+                'text-sm font-semibold uppercase tracking-wider mb-4 transition-colors duration-300',
+                colors.heading
+              )}>
+                {category}
+              </h3>
               <ul className="space-y-3">
-                {links.map((link) => (
-                  <li key={link.label}>
-                    <Link href={link.href} className="text-slate-400 hover:text-white transition-colors text-sm">
+                {links.map((link, linkIndex) => (
+                  <motion.li
+                    key={link.label}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.4 + colIndex * 0.1 + linkIndex * 0.05 }}
+                  >
+                    <Link 
+                      href={link.href} 
+                      className={cn(
+                        'text-sm transition-all duration-200 inline-block relative group',
+                        colors.link
+                      )}
+                    >
                       {link.label}
+                      <span className={cn(
+                        "absolute bottom-0 left-0 w-0 h-0.5 transition-all duration-300",
+                        isDark ? "bg-blue-400" : "bg-blue-600",
+                        "group-hover:w-full"
+                      )} />
                     </Link>
-                  </li>
+                  </motion.li>
                 ))}
               </ul>
-            </div>
+            </motion.div>
           ))}
         </div>
         
-        <div className="mt-12 pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-slate-500 text-sm">
+        {/* Bottom Bar */}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6 }}
+          className={cn(
+            'mt-12 pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-4 transition-colors duration-300',
+            borderColor
+          )}
+        >
+          <p className={cn(
+            'text-sm transition-colors duration-300',
+            colors.muted
+          )}>
             © {new Date().getFullYear()} SaaS Platform. All rights reserved.
           </p>
-          <div className="flex space-x-6">
+          <div className="flex flex-wrap justify-center gap-4 md:gap-6">
             {footerLinks.legal.map((link) => (
               <Link 
                 key={link.label} 
                 href={link.href} 
-                className="text-slate-500 hover:text-white text-sm transition-colors"
+                className={cn(
+                  'text-sm transition-colors duration-200 hover:underline underline-offset-2',
+                  colors.link
+                )}
               >
                 {link.label}
               </Link>
+            ))}
+          </div>
+        </motion.div>
+      </div>
+    </motion.footer>
+  )
+}
+
+// ═══════════════════════════════════════════════════
+// SKELETON COMPONENT
+// ═══════════════════════════════════════════════════
+
+function FooterSkeleton() {
+  return (
+    <footer className="bg-slate-900 border-t border-slate-800">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 lg:gap-12">
+          <div className="col-span-2">
+            <div className="w-32 h-8 bg-slate-700 rounded-lg animate-pulse mb-4" />
+            <div className="w-48 h-4 bg-slate-700 rounded-lg animate-pulse mb-6" />
+            <div className="flex space-x-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="w-10 h-10 bg-slate-700 rounded-xl animate-pulse" />
+              ))}
+            </div>
+            <div className="mt-6 w-48 h-6 bg-slate-700 rounded-full animate-pulse" />
+          </div>
+          {[1, 2, 3].map((col) => (
+            <div key={col}>
+              <div className="w-16 h-4 bg-slate-700 rounded-lg animate-pulse mb-4" />
+              <div className="space-y-3">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="w-24 h-3 bg-slate-700 rounded-lg animate-pulse" />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="mt-12 pt-8 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="w-48 h-4 bg-slate-700 rounded-lg animate-pulse" />
+          <div className="flex space-x-6">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="w-16 h-4 bg-slate-700 rounded-lg animate-pulse" />
             ))}
           </div>
         </div>
