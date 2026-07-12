@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./public/image.png" alt="BoilerPlateNextjs Banner" width="800" />
+  <img src="./public/image-preview.png" alt="BoilerPlateNextjs Banner" width="800" />
 </p>
 
 <h1 align="center">🚀 BoilerPlateNextjs</h1>
