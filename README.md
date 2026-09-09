@@ -315,6 +315,7 @@ We welcome contributions! When adding new features, please follow these guidelin
 
 ---
 
+
 <p align="center">
   Built with ❤️ using <a href="https://nextjs.org">Next.js</a> & <a href="https://tailwindcss.com">Tailwind CSS</a>
 </p>
